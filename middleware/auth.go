@@ -57,8 +57,12 @@ func CurrentBusiness() gin.HandlerFunc {
 }
 
 // AuthRequired 需要登录
-func AuthBusinessRequired() gin.HandlerFunc {
+func AuthBusinessRequired(open bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if !open{
+			c.Next()
+			return
+		}
 		if business, _ := c.Get("business"); business != nil {
 			if _, ok := business.(*model.Business); ok {
 				c.Next()

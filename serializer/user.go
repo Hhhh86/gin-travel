@@ -2,7 +2,7 @@ package serializer
 
 import "singo/model"
 
-// Business 用户序列化器
+// User 用户序列化器
 type User struct {
 	ID        uint   `json:"id"`
 	UserName  string `json:"user_name"`

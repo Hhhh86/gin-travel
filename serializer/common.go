@@ -1,6 +1,8 @@
 package serializer
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 // Response 基础序列化器
 type Response struct {
@@ -21,6 +23,8 @@ type TrackedErrorResponse struct {
 // 五开头的五位数错误编码为服务器端错误，比如数据库操作失败
 // 四开头的五位数错误编码为客户端错误，有时候是客户端代码写错了，有时候是用户操作错误
 const (
+	//Success 成功
+	Success = 0
 	// CodeCheckLogin 未登录
 	CodeCheckLogin = 401
 	// CodeNoRightErr 未授权访问
@@ -68,4 +72,14 @@ func ParamErr(msg string, err error) Response {
 		msg = "参数错误"
 	}
 	return Err(CodeParamErr, msg, err)
+}
+
+//操作成功
+// BuildUserResponse 序列化用户响应
+func SuccessResponse() Response {
+	return Response{
+		Code: Success,
+		Msg:  "操作成功",
+	}
+
 }

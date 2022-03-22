@@ -20,6 +20,12 @@ func NewRouter() *gin.Engine {
 
 	//127.0.0.1/ping
 	r.GET("ping", api.Ping)
+	//todo 全部旅游景点页
+	r.GET("/all/spot", api.AllSpot)
+	//todo 全部旅游产品页
+	r.GET("/all/products", api.UserMe)
+	//todo 旅游攻略页
+	r.GET("/detail/list", api.UserMe)
 	// 路由
 	v1 := r.Group("/api/user")
 	{
@@ -30,7 +36,7 @@ func NewRouter() *gin.Engine {
 		v1.POST("/login", api.UserLogin)
 
 		// 需要登录保护的
-		auth := v1.Group("",middleware.AuthRequired(false))
+		auth := v1.Group("", middleware.AuthRequired(true))
 		{
 			// User Routing
 			auth.GET("/me", api.UserMe)
@@ -40,8 +46,7 @@ func NewRouter() *gin.Engine {
 			auth.DELETE("/delete/info", api.UserLogin)
 			auth.POST("/retrieve/info", api.UserLogin)
 			auth.PUT("/update/info", api.UserLogin)
-			//todo 全部旅游产品页
-			auth.GET("/all/list", api.UserMe)
+
 			//todo 推荐旅游产品页
 			auth.GET("/recommend/list", api.UserMe)
 			//todo 报名
@@ -52,8 +57,6 @@ func NewRouter() *gin.Engine {
 			auth.DELETE("/cancel/order", api.UserMe)
 			//todo 评价订单
 			auth.POST("/evaluate/order", api.UserMe)
-			//todo 旅游攻略页
-			auth.GET("/detail/list", api.UserMe)
 			//todo 发布攻略
 			auth.POST("/publish/strategy", api.UserMe)
 			//todo 评论
@@ -78,16 +81,15 @@ func NewRouter() *gin.Engine {
 		v2.POST("/login", api.BusinessLogin)
 
 		// 需要登录保护的
-		auth := v2.Group("",middleware.AuthBusinessRequired())
+		auth := v2.Group("", middleware.AuthBusinessRequired(false))
 		{
 			// business Routing
-			auth.GET("/me", api.UserMe) //todo
+			auth.GET("/me", api.UserMe)            //todo
 			auth.DELETE("/logout", api.UserLogout) //todo
 			//todo 旅游景点资料 crud
-			auth.POST("/create/products", api.UserLogin)
-			auth.DELETE("/delete/products", api.UserLogin)
-			auth.POST("/retrieve/products", api.UserLogin)
-			auth.PUT("/update/products", api.UserLogin)
+			auth.POST("/create/spot", api.CreateSpot)
+			auth.DELETE("/delete/spot/:id", api.DeleteSpot)
+			auth.PUT("/update/spot/:id", api.UpdateSpot)
 			//todo 旅游产品资料 crud
 			auth.POST("/create/products", api.UserLogin)
 			auth.DELETE("/delete/products", api.UserLogin)
