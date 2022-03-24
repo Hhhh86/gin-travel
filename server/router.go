@@ -15,8 +15,7 @@ func NewRouter() *gin.Engine {
 	// 中间件, 顺序不能改
 	r.Use(middleware.Session(os.Getenv("SESSION_SECRET")))
 	r.Use(middleware.Cors())
-	r.Use(middleware.CurrentUser())
-	r.Use(middleware.CurrentBusiness())
+	r.Use(middleware.CurrentUser(), middleware.CurrentBusiness())
 
 	//127.0.0.1/ping
 	r.GET("ping", api.Ping)
@@ -24,6 +23,8 @@ func NewRouter() *gin.Engine {
 	r.GET("/all/spot", api.AllSpot)
 	//todo 全部旅游产品页
 	r.GET("/all/products", api.UserMe)
+	//根据sid查询对应的产品
+	r.GET("/retrieve/products:sid", api.UserLogin)
 	//todo 旅游攻略页
 	r.GET("/detail/list", api.UserMe)
 	// 路由
@@ -75,26 +76,25 @@ func NewRouter() *gin.Engine {
 	v2 := r.Group("/api/business")
 	{
 		// 商家注册
-		v2.POST("/register", api.BusinessRegister)
+		v2.POST("/register", api.BusinessRegister) //done
 
 		// 商家登录
-		v2.POST("/login", api.BusinessLogin)
+		v2.POST("/login", api.BusinessLogin) //done
 
 		// 需要登录保护的
-		auth := v2.Group("", middleware.AuthBusinessRequired(false))
+		auth := v2.Group("", middleware.AuthBusinessRequired(true))
 		{
 			// business Routing
-			auth.GET("/me", api.UserMe)            //todo
-			auth.DELETE("/logout", api.UserLogout) //todo
-			//todo 旅游景点资料 crud
+			auth.GET("/me", api.BusinessMe)            //done
+			auth.DELETE("/logout", api.BusinessLogout) //done
+			//done 旅游景点资料 crud
 			auth.POST("/create/spot", api.CreateSpot)
 			auth.DELETE("/delete/spot/:id", api.DeleteSpot)
 			auth.PUT("/update/spot/:id", api.UpdateSpot)
 			//todo 旅游产品资料 crud
-			auth.POST("/create/products", api.UserLogin)
-			auth.DELETE("/delete/products", api.UserLogin)
-			auth.POST("/retrieve/products", api.UserLogin)
-			auth.PUT("/update/products", api.UserLogin)
+			auth.POST("/create/product", api.CreateProduct)
+			auth.DELETE("/delete/product", api.UserLogin)
+			auth.PUT("/update/product", api.UserLogin)
 			//todo 查看订单信息
 			auth.GET("/retrieve/order", api.UserLogin)
 			//todo 处理订单(接受/拒绝)

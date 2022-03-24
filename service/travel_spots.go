@@ -43,7 +43,7 @@ type DeleteSpotService struct {
 }
 
 // DeleteSpot 删除景点信息
-func (service *DeleteSpotService) DeleteSpot(c *gin.Context,id string) serializer.Response {
+func (service *DeleteSpotService) DeleteSpot(c *gin.Context, id string) serializer.Response {
 	var info model.SpotInfo
 	err := model.DB.First(&info, id).Error
 	if err != nil {
@@ -65,7 +65,7 @@ func (service *DeleteSpotService) DeleteSpot(c *gin.Context,id string) serialize
 	return serializer.SuccessResponse()
 }
 
-// CreateSpotService 新建景点信息结构体
+// UpdateSpotService 新建景点信息结构体
 type UpdateSpotService struct {
 	AgeScope     int    `json:"age_scope"`  //1Children、2Youth、3Midlife、4Aged、5all
 	PlaceType    int    `json:"place_type"` //1自然生态类、2历史文化类、3现代游乐类、4产业融合类、5其他类。
@@ -76,8 +76,8 @@ type UpdateSpotService struct {
 	OpenTime     string `json:"open_time" binding:"required,min=0,max=20"`
 }
 
-// CreateSpot 新建景点信息
-func (service *UpdateSpotService) UpdateSpot(c *gin.Context,id string) serializer.Response {
+// UpdateSpot 更新景点信息
+func (service *UpdateSpotService) UpdateSpot(c *gin.Context, id string) serializer.Response {
 	// 查找景点
 	var info model.SpotInfo
 	err := model.DB.First(&info, id).Error
@@ -112,8 +112,8 @@ func (service *UpdateSpotService) UpdateSpot(c *gin.Context,id string) serialize
 
 // ListSpotService 全部景点信息结构体
 type ListSpotService struct {
-	Start int `json:"start"`
-	Limit int `json:"limit"`
+	Start int `form:"start" json:"start"`
+	Limit int `form:"limit" json:"limit"`
 }
 
 // List 景点列表
@@ -135,9 +135,9 @@ func (service *ListSpotService) ListSpot(c *gin.Context) serializer.Response {
 
 	if err := model.DB.Limit(service.Limit).Offset(service.Start).Find(&infos).Error; err != nil {
 		return serializer.Response{
-			Code: 50000,
-			Msg:    "数据库连接错误",
-			Error:  err.Error(),
+			Code:  50000,
+			Msg:   "数据库连接错误",
+			Error: err.Error(),
 		}
 	}
 

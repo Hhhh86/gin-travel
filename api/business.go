@@ -1,7 +1,9 @@
 package api
 
 import (
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"singo/serializer"
 	"singo/service"
 )
 
@@ -27,3 +29,20 @@ func BusinessLogin(c *gin.Context) {
 	}
 }
 
+// BusinessMe 商家详情
+func BusinessMe(c *gin.Context) {
+	business := CurrentBusiness(c)
+	res := serializer.BuildBusinessResponse(*business)
+	c.JSON(200, res)
+}
+
+// BusinessLogout 商家登出
+func BusinessLogout(c *gin.Context) {
+	s := sessions.Default(c)
+	s.Clear()
+	s.Save()
+	c.JSON(200, serializer.Response{
+		Code: 0,
+		Msg:  "登出成功",
+	})
+}

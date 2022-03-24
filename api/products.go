@@ -7,9 +7,9 @@ import (
 
 // CreateProduct 新建产品
 func CreateProduct(c *gin.Context) {
-	var service service.BusinessLoginService
+	var service service.ProductInfoService
 	if err := c.ShouldBind(&service); err == nil {
-		res := service.Login(c)
+		res := service.CreateProduct(c)
 		c.JSON(200, res)
 	} else {
 		c.JSON(200, ErrorResponse(err))

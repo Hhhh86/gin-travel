@@ -10,7 +10,7 @@ import (
 
 // BusinessLoginService 管理商家登录的服务
 type BusinessLoginService struct {
-	CompanyName string `form:"company_name" json:"company_name" binding:"required,min=5,max=30"`
+	CompanyName string `form:"company_name" json:"company_name" binding:"required,min=0,max=30"`
 	Password    string `form:"password" json:"password" binding:"required,min=8,max=40"`
 }
 
@@ -18,7 +18,7 @@ type BusinessLoginService struct {
 func (service *BusinessLoginService) setSession(c *gin.Context, business model.Business) {
 	s := sessions.Default(c)
 	s.Clear()
-	s.Set("user_id", business.ID)
+	s.Set("business_id", business.ID)
 	s.Save()
 }
 

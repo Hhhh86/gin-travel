@@ -15,6 +15,16 @@ type User struct {
 	Avatar         string `gorm:"size:1000"`
 }
 
+// UserInfo 用户详细信息模型
+type UserInfo struct {
+	gorm.Model
+	Sex            int //1女 2男
+	PlaceType      int //1自然生态类、2历史文化类、3现代游乐类、4产业融合类、5其他类。
+	AgeScope       int //0Children、1Youth、2Midlife，3Aged
+	ExpectMinPrice int //期望最小价格
+	ExpectMaxPrice int //期望最大价格
+}
+
 // GetUser 用ID获取用户
 func GetUser(ID interface{}) (User, error) {
 	var user User
@@ -36,14 +46,4 @@ func (user *User) SetPassword(password string) error {
 func (user *User) CheckPassword(password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(user.PasswordDigest), []byte(password))
 	return err == nil
-}
-
-// UserInfo 用户推荐模型
-type UserInfo struct {
-	gorm.Model
-	Sex            int //1女 2男
-	PlaceType      int //1自然生态类、2历史文化类、3现代游乐类、4产业融合类、5其他类。
-	AgeScope       int //0Children、1Youth、2Midlife，3Aged
-	ExpectMinPrice int //期望最小价格
-	ExpectMaxPrice int //期望最大价格
 }

@@ -29,6 +29,16 @@ func CurrentUser(c *gin.Context) *model.User {
 	return nil
 }
 
+// CurrentBusiness 获取当前商家
+func CurrentBusiness(c *gin.Context) *model.Business {
+	if business, _ := c.Get("business"); business != nil {
+		if b, ok := business.(*model.Business); ok {
+			return b
+		}
+	}
+	return nil
+}
+
 // ErrorResponse 返回错误消息
 func ErrorResponse(err error) serializer.Response {
 	if ve, ok := err.(validator.ValidationErrors); ok {

@@ -1,11 +1,11 @@
 package service
 
 import (
+	"github.com/gin-contrib/sessions"
 	"singo/cache"
 	"singo/model"
 	"singo/serializer"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -35,7 +35,7 @@ func (service *UserLoginService) Login(c *gin.Context) serializer.Response {
 		return serializer.ParamErr("账号或密码错误", nil)
 	}
 	//更新在线人数
-	cache.RedisClient.IncrBy("all_number",1)
+	cache.RedisClient.IncrBy("all_number", 1)
 	// 设置session
 	service.setSession(c, user)
 
