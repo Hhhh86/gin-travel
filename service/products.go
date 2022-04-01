@@ -275,12 +275,12 @@ func (service *LikeProductService) LikeProduct(c *gin.Context, pid string) seria
 	if c_user, _ := c.Get("user"); c_user != nil {
 		if u, ok := c_user.(*model.User); ok {
 			skey := "product_like_" + u.UserName
-			zkey := "product_like_" + pid
+			key := "product_like_" + pid
 			//是否已经点赞
 			isExist := cache.RedisClient.SIsMember(skey, pid).Val()
 			if !isExist {
 				cache.RedisClient.SAdd(skey, pid)
-				cache.RedisClient.IncrBy(zkey, 1)
+				cache.RedisClient.IncrBy(key, 1)
 			} else {
 				return serializer.Response{
 					Code: 400,
@@ -307,12 +307,12 @@ func (service *LikeProductService) DisLikeProduct(c *gin.Context, pid string) se
 	if c_user, _ := c.Get("user"); c_user != nil {
 		if u, ok := c_user.(*model.User); ok {
 			skey := "product_like_" + u.UserName
-			zkey := "product_like_" + pid
+			key := "product_like_" + pid
 			//是否已经点赞
 			isExist := cache.RedisClient.SIsMember(skey, pid).Val()
 			if isExist {
 				cache.RedisClient.SRem(skey, pid)
-				cache.RedisClient.IncrBy(zkey, -1)
+				cache.RedisClient.IncrBy(key, -1)
 			} else {
 				return serializer.Response{
 					Code: 400,

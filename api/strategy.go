@@ -40,3 +40,18 @@ func DeleteStrategyComment(c *gin.Context) {
 	res := service.DeleteComment(c,c.Param("stid"))
 	c.JSON(200, res)
 }
+
+
+// LikeStrategy 点赞攻略
+func LikeStrategy(c *gin.Context) {
+	var service service.LikeStrategyService
+	res := service.LikeStrategy(c, c.Param("stid"))
+	c.JSON(200, res)
+}
+
+// DisLikeStrategy 取消点赞攻略
+func DisLikeStrategy(c *gin.Context) {
+	var service service.LikeStrategyService
+	res := service.DisLikeStrategy(c, c.Param("stid"))
+	c.JSON(200, res)
+}

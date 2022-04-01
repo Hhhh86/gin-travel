@@ -83,9 +83,9 @@ func NewRouter() *gin.Engine {
 			//todo 删除攻略评论
 			auth.DELETE("/strategy/comment/delete/:stid", api.DeleteStrategyComment) //done
 			//todo 点赞攻略
-			auth.GET("/strategy/like/:eid", api.UserMe)
+			auth.GET("/strategy/like/:stid", api.LikeStrategy) //done
 			//todo 取消点赞攻略
-			auth.GET("/strategy/dislike/:eid", api.UserMe)
+			auth.GET("/strategy/dislike/:stid", api.DisLikeStrategy) //done
 			//todo 抽奖
 			auth.POST("/draw/beat", api.UserMe)
 			//todo 获奖记录

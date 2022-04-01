@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
+	"singo/cache"
 	"singo/model"
 	"singo/serializer"
 )
@@ -133,6 +134,82 @@ func (service *DeleteStrategyCommentService) DeleteComment(c *gin.Context, id st
 					Code:  500,
 					Msg:   "删除评论错误",
 					Error: err.Error(),
+				}
+			}
+
+		}
+	}
+	return serializer.SuccessResponse()
+}
+
+// LikeStrategyService 收藏产品信息结构体
+type LikeStrategyService struct {
+}
+
+func (service *LikeStrategyService) LikeStrategy(c *gin.Context, id string) serializer.Response {
+	//攻略是否存在
+	var strategy model.StrategyInfo
+	err := model.DB.First(&strategy, id).Error
+	if err != nil {
+		return serializer.Response{
+			Code:  404,
+			Msg:   "攻略不存在",
+			Error: err.Error(),
+		}
+	}
+	//string 用户积分
+	ukey := "score_" + strategy.UserName
+	if c_user, _ := c.Get("user"); c_user != nil {
+		if u, ok := c_user.(*model.User); ok {
+			//set 用户是否有点赞
+			skey := "strategy_like_" + u.UserName
+			//string 攻略的点赞
+			key := "strategy_like_" + id
+			//是否已经点赞
+			isExist := cache.RedisClient.SIsMember(skey, id).Val()
+			if !isExist {
+				cache.RedisClient.SAdd(skey, id)
+				cache.RedisClient.IncrBy(key, 1)
+				//增加积分
+				cache.RedisClient.IncrBy(ukey, 1)
+			} else {
+				return serializer.Response{
+					Code: 400,
+					Msg:  "攻略已点赞",
+				}
+			}
+
+		}
+	}
+	return serializer.SuccessResponse()
+}
+
+func (service *LikeStrategyService) DisLikeStrategy(c *gin.Context, id string) serializer.Response {
+	var strategy model.StrategyInfo
+	err := model.DB.First(&strategy, id).Error
+	if err != nil {
+		return serializer.Response{
+			Code:  404,
+			Msg:   "攻略不存在",
+			Error: err.Error(),
+		}
+	}
+	//string 用户积分
+	ukey := "score_" + strategy.UserName
+	if c_user, _ := c.Get("user"); c_user != nil {
+		if u, ok := c_user.(*model.User); ok {
+			skey := "strategy_like_" + u.UserName
+			key := "strategy_like_" + id
+			//是否已经点赞
+			isExist := cache.RedisClient.SIsMember(skey, id).Val()
+			if isExist {
+				cache.RedisClient.SRem(skey, id)
+				cache.RedisClient.IncrBy(key, -1)
+				cache.RedisClient.IncrBy(ukey, -1)
+			} else {
+				return serializer.Response{
+					Code: 400,
+					Msg:  "攻略尚未点赞",
 				}
 			}
 
