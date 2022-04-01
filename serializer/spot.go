@@ -19,7 +19,7 @@ type SpotInfo struct {
 	OpenTime     string
 }
 
-// BuildUser 序列化用户
+// BuildSpot 序列化景点
 func BuildSpot(spot model.SpotInfo) SpotInfo {
 	return SpotInfo{
 		ID:           spot.ID,

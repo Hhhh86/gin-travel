@@ -15,25 +15,25 @@ func NewRouter() *gin.Engine {
 	// 中间件, 顺序不能改
 	r.Use(middleware.Session(os.Getenv("SESSION_SECRET")))
 	r.Use(middleware.Cors())
-	r.Use(middleware.CurrentUser(), middleware.CurrentBusiness())
+	r.Use(middleware.CurrentUserAndBusiness())
 
 	//127.0.0.1/ping
 	r.GET("ping", api.Ping)
 	//todo 全部旅游景点页
-	r.GET("/all/spot", api.AllSpot)
+	r.GET("/spot/all", api.AllSpot) //done
 	//todo 全部旅游产品页
-	r.GET("/all/products", api.UserMe)
-	//根据sid查询对应的产品
-	r.GET("/retrieve/products:sid", api.UserLogin)
+	r.GET("/products/all", api.AllProduct) //done
+	//todo 根据sid查询对应的产品
+	r.GET("/products/retrieve/:id", api.GetProductByID) //done
 	//todo 旅游攻略页
-	r.GET("/detail/list", api.UserMe)
+	r.GET("/list/detail", api.UserMe)
 	// 路由
 	v1 := r.Group("/api/user")
 	{
-		// 用户注册
+		//done 用户注册
 		v1.POST("/register", api.UserRegister)
 
-		// 用户登录
+		//done 用户登录
 		v1.POST("/login", api.UserLogin)
 
 		// 需要登录保护的
@@ -43,29 +43,49 @@ func NewRouter() *gin.Engine {
 			auth.GET("/me", api.UserMe)
 			auth.DELETE("/logout", api.UserLogout)
 			//todo 个人资料 crud
-			auth.POST("/create/info", api.UserLogin)
-			auth.DELETE("/delete/info", api.UserLogin)
-			auth.POST("/retrieve/info", api.UserLogin)
-			auth.PUT("/update/info", api.UserLogin)
-
+			auth.POST("/info/create", api.CreateInfo)    //done
+			auth.DELETE("/info/delete", api.DeleteInfo)  //done
+			auth.GET("/info/retrieve", api.RetrieveInfo) //done
+			auth.PUT("/info/update", api.UpdateInfo)     //done
+			//todo 推荐用户
+			//todo 添加好友
+			//todo 用户私信
 			//todo 推荐旅游产品页
-			auth.GET("/recommend/list", api.UserMe)
+			auth.GET("/list/recommend", api.UserMe)
+			//todo 收藏景点
+			auth.GET("/spot/collect/:sid", api.CollectSpot) //done
+			//todo 收藏产品
+			auth.GET("/product/collect/:pid", api.CollectProduct) //done
+			//todo 点赞产品
+			auth.GET("/product/like/:pid", api.LikeProduct) //done
+			//todo 取消点赞产品
+			auth.GET("/product/dislike/:pid", api.DisLikeProduct) //done
+			//todo 查看收藏
+			auth.GET("/collect/retrieve/:tag", api.UserMe)
 			//todo 报名
-			auth.POST("/apply", api.UserMe)
-			//todo 查看订单
-			auth.GET("/retrieve/order", api.UserMe)
+			auth.POST("/order/create", api.CreateOrder) //done
+			//todo 查看全部订单
+			auth.GET("/order/all/retrieve", api.RetrieveAllOrder) //done
+			//todo 查看单一订单
+			auth.GET("/order/one/retrieve/:id", api.RetrieveOneOrder) //done
 			//todo 取消订单
-			auth.DELETE("/cancel/order", api.UserMe)
+			auth.POST("/order/cancel/:id", api.CancelOrder) //done
+			//todo 删除订单
+			auth.DELETE("/order/delete/:id", api.DeleteOrder) //done
 			//todo 评价订单
-			auth.POST("/evaluate/order", api.UserMe)
-			//todo 发布攻略
-			auth.POST("/publish/strategy", api.UserMe)
-			//todo 评论
-			auth.POST("/evaluate/strategy", api.UserMe)
-			//todo 点赞
-			auth.GET("/like/strategy", api.UserMe)
-			//todo 取消点赞
-			auth.GET("/dislike/strategy", api.UserMe)
+			auth.POST("/order/evaluate", api.EvaluateOrder) //done
+			//todo 发布景点攻略
+			auth.POST("/strategy/create", api.CreateStrategy) //done
+			//todo 删除景点攻略
+			auth.DELETE("/strategy/delete/:sid", api.DeleteStrategy) //done
+			//todo 评论攻略
+			auth.POST("/strategy/comment/create", api.CreateStrategyComment) //done
+			//todo 删除攻略评论
+			auth.DELETE("/strategy/comment/delete/:stid", api.DeleteStrategyComment) //done
+			//todo 点赞攻略
+			auth.GET("/strategy/like/:eid", api.UserMe)
+			//todo 取消点赞攻略
+			auth.GET("/strategy/dislike/:eid", api.UserMe)
 			//todo 抽奖
 			auth.POST("/draw/beat", api.UserMe)
 			//todo 获奖记录
@@ -82,25 +102,25 @@ func NewRouter() *gin.Engine {
 		v2.POST("/login", api.BusinessLogin) //done
 
 		// 需要登录保护的
-		auth := v2.Group("", middleware.AuthBusinessRequired(true))
+		auth := v2.Group("", middleware.AuthBusinessRequired(false))
 		{
 			// business Routing
 			auth.GET("/me", api.BusinessMe)            //done
 			auth.DELETE("/logout", api.BusinessLogout) //done
-			//done 旅游景点资料 crud
-			auth.POST("/create/spot", api.CreateSpot)
-			auth.DELETE("/delete/spot/:id", api.DeleteSpot)
-			auth.PUT("/update/spot/:id", api.UpdateSpot)
+			//todo 旅游景点资料 crud
+			auth.POST("/spot/create", api.CreateSpot)       //done
+			auth.DELETE("/spot/delete/:id", api.DeleteSpot) //done
+			auth.PUT("/spot/update/:id", api.UpdateSpot)    //done
 			//todo 旅游产品资料 crud
-			auth.POST("/create/product", api.CreateProduct)
-			auth.DELETE("/delete/product", api.UserLogin)
-			auth.PUT("/update/product", api.UserLogin)
+			auth.POST("/product/create", api.CreateProduct)       //done
+			auth.DELETE("/product/delete/:id", api.DeleteProduct) //done
+			auth.PUT("/product/update", api.UpdateProduct)        //done
 			//todo 查看订单信息
-			auth.GET("/retrieve/order", api.UserLogin)
+			auth.GET("/order/retrieve", api.UserLogin)
 			//todo 处理订单(接受/拒绝)
-			auth.POST("/handle/order", api.UserLogin)
+			auth.POST("/order/handle", api.UserLogin)
 			//todo 查看订单评价
-			auth.POST("/retrieve/evaluation", api.UserLogin)
+			auth.GET("/evaluate/retrieve", api.UserLogin)
 		}
 	}
 	return r

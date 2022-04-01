@@ -44,3 +44,10 @@ func AllSpot(c *gin.Context) {
 		c.JSON(200, ErrorResponse(err))
 	}
 }
+
+// CollectSpot 收藏景点
+func CollectSpot(c *gin.Context) {
+	var service service.CollectSpotService
+	res := service.CollectSpot(c, c.Param("sid"))
+	c.JSON(200, res)
+}

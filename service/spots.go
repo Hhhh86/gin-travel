@@ -2,8 +2,11 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis"
+	"singo/cache"
 	"singo/model"
 	"singo/serializer"
+	"time"
 )
 
 // CreateSpotService 新建景点信息结构体
@@ -65,7 +68,7 @@ func (service *DeleteSpotService) DeleteSpot(c *gin.Context, id string) serializ
 	return serializer.SuccessResponse()
 }
 
-// UpdateSpotService 新建景点信息结构体
+// UpdateSpotService 更新景点信息结构体
 type UpdateSpotService struct {
 	AgeScope     int    `json:"age_scope"`  //1Children、2Youth、3Midlife、4Aged、5all
 	PlaceType    int    `json:"place_type"` //1自然生态类、2历史文化类、3现代游乐类、4产业融合类、5其他类。
@@ -105,9 +108,7 @@ func (service *UpdateSpotService) UpdateSpot(c *gin.Context, id string) serializ
 		}
 	}
 
-	return serializer.Response{
-		Data: serializer.SuccessResponse(),
-	}
+	return serializer.SuccessResponse()
 }
 
 // ListSpotService 全部景点信息结构体
@@ -125,14 +126,6 @@ func (service *ListSpotService) ListSpot(c *gin.Context) serializer.Response {
 		service.Limit = 6
 	}
 
-	//if err := model.DB.Model(model.SpotInfo{}).Count(&total).Error; err != nil {
-	//	return serializer.Response{
-	//		Code: 50000,
-	//		Msg:    "数据库连接错误",
-	//		Error:  err.Error(),
-	//	}
-	//}
-
 	if err := model.DB.Limit(service.Limit).Offset(service.Start).Find(&infos).Error; err != nil {
 		return serializer.Response{
 			Code:  50000,
@@ -142,4 +135,44 @@ func (service *ListSpotService) ListSpot(c *gin.Context) serializer.Response {
 	}
 
 	return serializer.BuildSpotResponse(infos)
+}
+
+// CollectSpotService 收藏景点信息结构体
+type CollectSpotService struct {
+}
+
+func (service *CollectSpotService) CollectSpot(c *gin.Context, sid string) serializer.Response {
+	//景点是否存在
+	var spot model.SpotInfo
+	err := model.DB.First(&spot, sid).Error
+	if err != nil {
+		return serializer.Response{
+			Code:  404,
+			Msg:   "景点不存在",
+			Error: err.Error(),
+		}
+	}
+	if c_user, _ := c.Get("user"); c_user != nil {
+		if u, ok := c_user.(*model.User); ok {
+			skey := "spot_set_"+u.UserName
+			zkey := "spot_zset_"+u.UserName
+			score := time.Now().Unix()
+			//是否已经收藏
+			isExist := cache.RedisClient.SIsMember(skey, sid).Val()
+			if !isExist {
+				cache.RedisClient.SAdd(skey, sid)
+				cache.RedisClient.ZAdd(zkey, redis.Z{
+					Score:  float64(score),
+					Member: sid,
+				})
+			} else {
+				return serializer.Response{
+					Code: 400,
+					Msg:  "景点已收藏",
+				}
+			}
+
+		}
+	}
+	return serializer.SuccessResponse()
 }

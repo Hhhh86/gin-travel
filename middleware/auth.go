@@ -8,8 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// CurrentUser 获取登录用户
-func CurrentUser() gin.HandlerFunc {
+// CurrentUserAndBusiness 获取登录用户
+func CurrentUserAndBusiness() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 		uid := session.Get("user_id")
@@ -19,6 +19,14 @@ func CurrentUser() gin.HandlerFunc {
 				c.Set("user", &user)
 			}
 		}
+		//商家
+		bid := session.Get("business_id")
+		if bid != nil {
+			business, err := model.GetBusiness(bid)
+			if err == nil {
+				c.Set("business", &business)
+			}
+		}
 		c.Next()
 	}
 }
@@ -26,7 +34,7 @@ func CurrentUser() gin.HandlerFunc {
 // AuthRequired 需要登录
 func AuthRequired(open bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !open{
+		if !open {
 			c.Next()
 			return
 		}
@@ -41,25 +49,11 @@ func AuthRequired(open bool) gin.HandlerFunc {
 	}
 }
 
-// CurrentBusiness 获取登录商家
-func CurrentBusiness() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		session := sessions.Default(c)
-		bid := session.Get("business_id")
-		if bid != nil {
-			business, err := model.GetBusiness(bid)
-			if err == nil {
-				c.Set("business", &business)
-			}
-		}
-		c.Next()
-	}
-}
 
 // AuthRequired 需要登录
 func AuthBusinessRequired(open bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !open{
+		if !open {
 			c.Next()
 			return
 		}

@@ -8,7 +8,7 @@ import (
 // User 用户模型
 type User struct {
 	gorm.Model
-	UserName       string
+	UserName       string `gorm:"index:idx_name,unique"`
 	PasswordDigest string
 	NickName       string
 	Status         string
@@ -23,6 +23,9 @@ type UserInfo struct {
 	AgeScope       int //0Children、1Youth、2Midlife，3Aged
 	ExpectMinPrice int //期望最小价格
 	ExpectMaxPrice int //期望最大价格
+	UserName       string
+	NickName       string
+	Avatar         string `gorm:"size:1000"`
 }
 
 // GetUser 用ID获取用户

@@ -44,7 +44,7 @@ func UserLogout(c *gin.Context) {
 	s.Clear()
 	s.Save()
 	//更新人数
-	cache.RedisClient.IncrBy("all_number",-1)
+	cache.RedisClient.IncrBy("all_number", -1)
 	c.JSON(200, serializer.Response{
 		Code: 0,
 		Msg:  "登出成功",
@@ -53,9 +53,9 @@ func UserLogout(c *gin.Context) {
 
 // CreateInfo 创建用户个性化信息
 func CreateInfo(c *gin.Context) {
-	var service service.UserLoginService
+	var service service.CreateInfoService
 	if err := c.ShouldBind(&service); err == nil {
-		res := service.Login(c)
+		res := service.CreateInfo(c)
 		c.JSON(200, res)
 	} else {
 		c.JSON(200, ErrorResponse(err))
@@ -64,31 +64,23 @@ func CreateInfo(c *gin.Context) {
 
 // DeleteInfo 删除用户个性化信息
 func DeleteInfo(c *gin.Context) {
-	var service service.UserLoginService
-	if err := c.ShouldBind(&service); err == nil {
-		res := service.Login(c)
-		c.JSON(200, res)
-	} else {
-		c.JSON(200, ErrorResponse(err))
-	}
+	var service service.DeleteInfoService
+	res := service.DeleteInfo(c)
+	c.JSON(200, res)
 }
 
 // RetrieveInfo 查看用户个性化信息
 func RetrieveInfo(c *gin.Context) {
-	var service service.UserLoginService
-	if err := c.ShouldBind(&service); err == nil {
-		res := service.Login(c)
-		c.JSON(200, res)
-	} else {
-		c.JSON(200, ErrorResponse(err))
-	}
+	var service service.RetrieveInfoService
+	res := service.RetrieveInfo(c)
+	c.JSON(200, res)
 }
 
 // UpdateInfo 更新用户个性化信息
 func UpdateInfo(c *gin.Context) {
-	var service service.UserLoginService
+	var service service.UpdateInfoService
 	if err := c.ShouldBind(&service); err == nil {
-		res := service.Login(c)
+		res := service.UpdateInfo(c)
 		c.JSON(200, res)
 	} else {
 		c.JSON(200, ErrorResponse(err))
